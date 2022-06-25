@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kie-server
+  namespace: drools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kie
+  template:
+    metadata:
+      labels:
+        app: kie
+    spec:
+      containers:
+        - name: kie
+          image: icodecraft/kie-server:latest  # customized jboss/kie-server-showcase
+          imagePullPolicy: Never # only on local else it should pull from remote repo
+          # imagePullPolicy: Always # Use for k8s server
+          resources:
+            limits:
+              memory: 1Gi
+              cpu: "1"
+            requests:
+              memory: 512Mi
+              cpu: "0.5"
+          ports:
+            - containerPort: 8080
+          securityContext:
+            privileged: true
+          env:
+            # Define the environment variable
+            - name: KIE_MAVEN_REPO
+              valueFrom:
+                configMapKeyRef:
+                   # The ConfigMap containing the value you want to assign to KIE_MAVEN_REPO
+                   name: kie-config
+                   # Specify the key associated with the value
+                   key: kie_maven_repo_path
+          volumeMounts: 
+            - name: drools-storage1  #use drools-storage for k8s PV & drools-storage-local in windows docker desktop
+              mountPath: /pv1
+      volumes: 
+        - name: drools-storage1
+          persistentVolumeClaim: 
+            claimName: pvc-claim1
+        - name: drools-storage-local #use for docker-desktop
+          hostPath:
+            path: /run/desktop/mnt/host/c/work/KIE/MVN_REPO
+            type: Directory
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kie-server
+  namespace: drools
+spec:
+  selector:
+    app: kie
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kie-server-np
+  namespace: drools
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31002
+  selector:
+    app: kie
+#  type: LoadBalancer

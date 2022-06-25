@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kie-wb
+  namespace: drools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kie-wb
+  template:
+    metadata:
+      labels:
+        app: kie-wb
+    spec:
+      containers:
+        - name: kie-wb
+          image: icodecraft/kie-wb:latest   #customized jboss/drools-workbench-showcase
+          imagePullPolicy: Never # only on local else it should pull from remote repo
+          # imagePullPolicy: Always # Use for k8s server
+          resources:
+            limits:
+              memory: 1Gi
+              cpu: "1"
+            requests:
+              memory: 512Mi
+              cpu: "0.5"
+          ports:
+            - containerPort: 8080
+            - containerPort: 8001
+          securityContext:
+            privileged: true
+          env:
+            # Define the environment variable
+            - name: KIE_WB_GIT_REPO
+              valueFrom:
+                configMapKeyRef:
+                   # The ConfigMap containing the value you want to assign to KIE_WB_GIT_REPO
+                   name: kie-wb-config
+                   # Specify the key associated with the value
+                   key: kie_wb_git_repo_path
+            - name: KIE_WB_M2_REPO
+              valueFrom:
+                configMapKeyRef:
+                   name: kie-wb-config
+                   key: kie_wb_m2_repo_path
+            - name: KIE_SERVER_LOCATION
+              valueFrom:
+                configMapKeyRef:
+                   name: kie-wb-config
+                   key: kie_server_host
+            - name: KIE_SERVER_PORT
+              valueFrom:
+                configMapKeyRef:
+                   name: kie-wb-config
+                   key: kie_server_port
+            - name: KIE_SERVER_PROTOCOL
+              valueFrom:
+                configMapKeyRef:
+                   name: kie-wb-config
+                   key: kie_server_protocol
+            - name: KIE_SERVER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: kie-wb-secret
+                  key: kie_server_user
+                  optional: false # same as default; "mysecret" must exist
+                                  # and include a key named "username"
+            - name: KIE_SERVER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: kie-wb-secret
+                  key: kie_server_pwd
+                  optional: false # same as default; "mysecret" must exist
+                                  # and include a key named "password"
+            - name: KIE_SERVER_CONTROLLER_USER
+              valueFrom:
+                secretKeyRef:
+                  name: kie-wb-secret
+                  key: kie_server_controller_user
+                  optional: false # same as default; "mysecret" must exist
+                                  # and include a key named "username"
+            - name: KIE_SERVER_CONTROLLER_PWD
+              valueFrom:
+                secretKeyRef:
+                  name: kie-wb-secret
+                  key: kie_server_controller_pwd
+                  optional: false # same as default; "mysecret" must exist
+                                  # and include a key named "password"
+          volumeMounts: 
+            - name: drools-storage2  #use drools-storage for k8s PV & drools-storage-local in windows docker desktop
+              mountPath: /pv2
+      volumes: 
+        - name: drools-storage2
+          persistentVolumeClaim: 
+            claimName: pvc-claim2
+        - name: drools-storage-local #use for docker-desktop
+          hostPath:
+            path: /run/desktop/mnt/host/c/work/KIE_WB/
+            type: Directory
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kie-wb
+  namespace: drools
+spec:
+  selector:
+    app: kie-wb
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+    - name: "8001"
+      port: 8001
+      targetPort: 8001
+#  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kie-wb-np
+  namespace: drools
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31001
+  selector:
+    app: kie-wb

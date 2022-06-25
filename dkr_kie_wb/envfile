@@ -1,0 +1,2 @@
+PERSISTANT_VOLUME=/pvolume
+M2_HOME=${env.PERSISTANT_VOLUME}/wb/m2repo/

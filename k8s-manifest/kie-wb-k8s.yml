@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kie-wb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kie-wb
+  template:
+    metadata:
+      labels:
+        app: kie-wb
+    spec:
+      containers:
+        - name: kie-wb
+          image: jboss/drools-workbench-showcase:latest
+          ports:
+            - containerPort: 8080
+            - containerPort: 8001
+          securityContext:
+            privileged: true
+          volumeMounts: 
+            - name: drools-storage-local  #use drools-storage for k8s PV
+              mountPath: /pv/maven_repo
+      volumes: 
+        - name: drools-storage
+          persistentVolumeClaim: 
+            claimName: pvc-claim
+        - name: drools-storage-local #use for docker-desktop
+          hostPath:
+            path: /run/desktop/mnt/host/c/work/STL/MVN_REPO
+            type: Directory
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kie-wb
+spec:
+  selector:
+    app: kie-wb
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+    - name: "8001"
+      port: 8001
+      targetPort: 8001
+#  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kie-wb-np
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31001
+  selector:
+    app: kie-wb

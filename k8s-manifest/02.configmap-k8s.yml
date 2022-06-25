@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kie-config
+  namespace: drools
+data:
+  # property-like keys; each key maps to a simple value
+  kie_maven_repo_path: "/pv1/kie/maven_repo/repository"
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: kie-wb-config
+  namespace: drools
+data:
+  # property-like keys; each key maps to a simple value
+  kie_wb_git_repo_path: "/pv2/kie_wb/git_repo"
+  kie_wb_m2_repo_path: "/pv2/kie_wb/m2_repo"
+  kie_server_host: "localhost" # kie server domain name or ip
+  kie_server_port: "31002" # node port mapped
+  kie_server_protocol: "http" # http or https

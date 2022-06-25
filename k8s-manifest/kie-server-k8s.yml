@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kie-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kie
+  template:
+    metadata:
+      labels:
+        app: kie
+    spec:
+      containers:
+        - name: kie
+          #image: jboss/kie-server-showcase:latest
+          image: stl-drools/kie-server:latest
+          imagePullPolicy: Never # only on local else it should pull from remote repo
+          ports:
+            - containerPort: 8080
+          securityContext:
+            privileged: true
+          volumeMounts: 
+            - name: drools-storage-local  #use drools-storage for k8s PV
+              mountPath: /pv/maven_repo
+      volumes: 
+        - name: drools-storage
+          persistentVolumeClaim: 
+            claimName: pvc-claim
+        - name: drools-storage-local #use for docker-desktop
+          hostPath:
+            path: /run/desktop/mnt/host/c/work/STL/MVN_REPO
+            type: Directory
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: kie-server
+spec:
+  selector:
+    app: kie
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kie-server-np
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 31002
+  selector:
+    app: kie
+#  type: LoadBalancer
