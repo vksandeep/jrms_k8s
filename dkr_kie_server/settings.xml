@@ -29,8 +29,8 @@ under the License.
 -->
 <settings>
   <!-- localRepository>${env.HOME}/.m2/repository</localRepository -->
-  <localRepository>/pv/maven_repo/repository</localRepository>
-  
+  <!-- localRepository>/pv/maven_repo/repository</localRepository -->
+  <localRepository>${env.KIE_MAVEN_REPO}</localRepository>
 
   <proxies>
   </proxies>

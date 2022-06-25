@@ -46,7 +46,8 @@
         <property name="designerdataobjects" value="${designerdataobjects:false}"/>
         <!-- Make GIT repositories available from outside localhost. -->
         <property name="org.uberfire.nio.git.ssh.host" value="0.0.0.0"/>
-		<!-- Customized ones -->
+
+		<!-- Customized ones sample -->
 	    <!-- property name="org.kie.server.id" value="wildfly-kieserver"/>
 		<property name="org.kie.server.user" value="kieserver"/>
 		<property name="org.kie.server.pwd" value="kieserver1!"/>
@@ -54,10 +55,17 @@
 		<property name="org.kie.server.controller" value="http://localhost:31002/kie-server/services/rest/server/"/>
 		<property name="org.server.controller.user" value="kieserver"/>
 		<property name="org.server.controller.pwd" value="kieserver1!"/ -->
-		
-		<property name="org.uberfire.nio.git.dir" value="${env.PERSISTANT_VOLUME}/wb/gitrepo/"/>
-		<property name="org.guvnor.m2repo.dir" value="${env.PERSISTANT_VOLUME}/wb/m2repo/"/>
-		<property name="M2_HOME" value="${env.PERSISTANT_VOLUME}/wb/m2repo/"/>
+
+    <!-- property name="org.kie.server.id" value="wildfly-kieserver"/>
+		<property name="org.kie.server.user" value="${env.KIE_SERVER_USER}"/>
+		<property name="org.kie.server.pwd" value="${env.KIE_SERVER_PWD}"/>
+		<property name="org.kie.server.location" value="${env.KIE_SERVER_PROTOCOL}://${env.KIE_SERVER_LOCATION}:${env.KIE_SERVER_PORT}/"/>
+		<property name="org.kie.server.controller" value="${env.KIE_SERVER_PROTOCOL}://${env.KIE_SERVER_LOCATION}:${env.KIE_SERVER_PORT}/kie-server/services/rest/server/"/>
+		<property name="org.server.controller.user" value="${env.KIE_SERVER_CONTROLLER_USER}"/>
+		<property name="org.server.controller.pwd" value="${env.KIE_SERVER_CONTROLLER_PWD}"/ -->
+		<property name="org.uberfire.nio.git.dir" value="${env.KIE_WB_GIT_REPO}/"/>
+		<property name="org.guvnor.m2repo.dir" value="${env.KIE_WB_M2_REPO}/"/>
+		<property name="M2_HOME" value="${env.KIE_WB_M2_REPO}/"/>
 		
     </system-properties>
 
