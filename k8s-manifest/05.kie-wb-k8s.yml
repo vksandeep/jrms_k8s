@@ -20,11 +20,11 @@ spec:
           # imagePullPolicy: Always # Use for k8s server
           resources:
             limits:
+              memory: 2Gi
+              cpu: "2"
+            requests:
               memory: 1Gi
               cpu: "1"
-            requests:
-              memory: 512Mi
-              cpu: "0.5"
           ports:
             - containerPort: 8080
             - containerPort: 8001
